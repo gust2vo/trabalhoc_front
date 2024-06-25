@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Home.css';
-
-interface Props {
-  incrementVisit: () => void;
-}
+import './Listar.css';
 
 interface Product {
   id: string;
@@ -12,14 +8,15 @@ interface Product {
   amount: number;
 }
 
-const Home: React.FC<Props> = ({ incrementVisit }) => {
+const ListarQtd: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [minQuantity, setMinQuantity] = useState<number>(0);
 
-  const fetchProducts = async () => {
+  const fetchProductsByQuantity = async (quantity: number) => {
     try {
-      const response = await fetch('http://localhost:5121/allProducts');
+      const response = await fetch(`http://localhost:5121/productsQuantity?minQuantity=${quantity}`);
       if (!response.ok) {
-        throw new Error('Erro ao buscar produtos');
+        throw new Error('Erro ao buscar produtos por quantidade');
       }
       const data = await response.json();
       setProducts(data);
@@ -28,12 +25,17 @@ const Home: React.FC<Props> = ({ incrementVisit }) => {
     }
   };
 
-  useEffect(() => {
-    fetchProducts(); // Busca os produtos apenas na montagem inicial
-  }, []);
-
   return (
     <div>
+      <div>
+        <input
+          type="number"
+          value={minQuantity}
+          onChange={(e) => setMinQuantity(parseInt(e.target.value))}
+          placeholder="Quantidade mínima"
+        />
+        <button onClick={() => fetchProductsByQuantity(minQuantity)}>Buscar por quantidade</button>
+      </div>
       <div className="parent">
         {products.map(product => (
           <div key={product.id} className="box">
@@ -47,4 +49,4 @@ const Home: React.FC<Props> = ({ incrementVisit }) => {
   );
 };
 
-export default Home;
+export default ListarQtd;

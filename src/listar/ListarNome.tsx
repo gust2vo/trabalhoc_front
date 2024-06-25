@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Home.css';
-
-interface Props {
-  incrementVisit: () => void;
-}
+import './Listar.css';
 
 interface Product {
   id: string;
@@ -12,14 +8,15 @@ interface Product {
   amount: number;
 }
 
-const Home: React.FC<Props> = ({ incrementVisit }) => {
+const ListarNome: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [name, setName] = useState<string>('');
 
-  const fetchProducts = async () => {
+  const fetchProductsByName = async (name: string) => {
     try {
-      const response = await fetch('http://localhost:5121/allProducts');
+      const response = await fetch(`http://localhost:5121/nameProducts?inputName=${name}`);
       if (!response.ok) {
-        throw new Error('Erro ao buscar produtos');
+        throw new Error('Erro ao buscar produtos por nome');
       }
       const data = await response.json();
       setProducts(data);
@@ -28,12 +25,17 @@ const Home: React.FC<Props> = ({ incrementVisit }) => {
     }
   };
 
-  useEffect(() => {
-    fetchProducts(); // Busca os produtos apenas na montagem inicial
-  }, []);
-
   return (
     <div>
+      <div>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nome do produto"
+        />
+        <button onClick={() => fetchProductsByName(name)}>Buscar por nome</button>
+      </div>
       <div className="parent">
         {products.map(product => (
           <div key={product.id} className="box">
@@ -47,4 +49,4 @@ const Home: React.FC<Props> = ({ incrementVisit }) => {
   );
 };
 
-export default Home;
+export default ListarNome;
